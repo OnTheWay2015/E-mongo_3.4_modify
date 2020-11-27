@@ -42,11 +42,22 @@ using std::stringstream;
 
 string Message::toString() const {
     stringstream ss;
-    ss << "op: " << networkOpToString(operation()) << " len: " << size();
-    if (operation() >= 2000 && operation() < 2100) {
+    auto sz = size();
+    if (!MsgData::ConstView(_buf.get()).valid()) {
+        return "";
+    }
+    auto v = operation();
+    ss << "op: " << networkOpToString(v) << " len: " << size();
+    //if (operation() >= 2000 && operation() < 2100) {
+    if (v >= 2000 && v < 2100) {
         DbMessage d(*this);
-        ss << " ns: " << d.getns();
-        switch (operation()) {
+        if (d.messageShouldHaveNs()) {
+            ss << " ns: " << d.getns();
+        } else {
+            ss << " ns: no ns DBMessage; ";
+        }
+        //switch (operation()) {
+        switch (v) {
             case dbUpdate: {
                 int flags = d.pullInt();
                 BSONObj q = d.nextJsObj();
@@ -75,7 +86,7 @@ string Message::toString() const {
                 break;
             }
             default: {
-                ss << "operation[" << operation() << "] CANNOT HANDLE YET \n "; 
+                ss << "operation[" << v << "] CANNOT HANDLE YET \n "; 
             } 
         }
     }

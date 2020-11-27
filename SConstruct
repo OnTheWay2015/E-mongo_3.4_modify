@@ -530,6 +530,9 @@ except IOError as e:
 except ValueError as e:
     print "Error decoding version.json: {0}".format(e)
     Exit(1)
+    
+version_data['version'] = "3.4.24"
+version_data['githash'] = "3a4b24"
 
 # Setup the command-line variables
 def variable_shlex_converter(val):
@@ -704,7 +707,6 @@ def validate_mongo_version(key, val, env):
         print("Invalid MONGO_VERSION '{}', or could not derive from version.json or git metadata. Please add a conforming MONGO_VERSION=x.y.z[-extra] as an argument to SCons".format(val))
         Exit(1)
 
-version_data['version'] = "3.4.24"
 env_vars.Add('MONGO_VERSION',
     help='Sets the version string for MongoDB',
     default=version_data['version'],
